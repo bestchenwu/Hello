@@ -55,14 +55,21 @@ fn add(request:&mut Request)->IronResult<Response>{
     };
     let mut numbers = Vec::new();
     for unparsed in unparsed_numbers{
-        match u32::from_str(&unparsed) {
+        match &unparsed.parse::<u32>() {
             Err(_)=>{
                 response.set_mut(Status::NotAcceptable);
                 response.set_mut(format!("bad input:{}",unparsed));
                 return Ok(response);
             },
-            Ok(n)=>{numbers.push(n);}
+            Ok(n)=>{numbers.push(n.clone());}
         }
     }
+    let mut sum:u32 = 0;
+    for k in &numbers{
+        sum+=k;
+    }
+    response.set_mut(status::Ok);
+    response.set_mut(mime!(Text/Html;Charset=Utf8));
+    response.set_mut(format!("the numbers:{:?} sum is {}",numbers,sum));
     Ok(response)
 }
